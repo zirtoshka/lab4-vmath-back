@@ -5,7 +5,10 @@ import exp.DeterminantException;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+
 public class MatrixManager {
     private int k;
 
@@ -20,6 +23,7 @@ public class MatrixManager {
 
 
     public  BigDecimal[][] straightRunning(BigDecimal[][] matrix) throws DeterminantException {
+        k=0;
         /*todo Если в процессе исключения неизвестных, коэффициенты:
        todo 𝒂𝟏𝟏,𝒂𝟐𝟐𝟏,𝒂𝟑𝟑𝟐…. = 0 ,
                 тогда необходимо соответственным образом переставить уравнения системы*/
@@ -57,24 +61,26 @@ public class MatrixManager {
         }
     }
 
-    public  BigDecimal[] reverseRunning(BigDecimal[][] matrix) {
+    public  List<BigDecimal> reverseRunning(BigDecimal[][] matrix) {
 
         int rows = matrix.length;
         int cols = rows + 1;
-        BigDecimal[] res = new BigDecimal[rows];
-        Arrays.fill(res, BigDecimal.ZERO);
+        List<BigDecimal> res = new ArrayList<>();
+        for (int i = 0; i < rows; i++) {
+            res.add(BigDecimal.ZERO);
+        }
         for (int i = rows - 1; i >= 0; i--) {
             BigDecimal x = matrix[i][i]; //это нужно занести в ответы
             BigDecimal b = matrix[i][cols - 1];
             for (int j = cols - 2; j > i; j--) { //это иксы справа
 
-                b = b.subtract(matrix[i][j].multiply(res[j]));
+                b = b.subtract(matrix[i][j].multiply(res.get(j)));
 
             }
             x = b.divide(matrix[i][i], new MathContext(5));
 //            System.out.println("x "+x+"b "+b);
 
-            res[i] = x;
+            res.set(i, x);
         }
 
         return res;
