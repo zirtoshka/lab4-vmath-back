@@ -72,14 +72,12 @@ public class ApproximationManager {
                 x -> res.get(0).add(
                         res.get(1).multiply(x).add(
                                 res.get(2).multiply(x.pow(2))
-                        ))   //a+bx+bx^2
+                        ))   //a+bx+cx^2
         ).toList();
 
 
         BigDecimal deviationMeasure = summator.getSumOfSquaresOfDiff(approxFun, pointsY, 2); //S
-        System.out.println("dev " + deviationMeasure);
         res.add(deviationMeasure);
-        System.out.println(1);
 
         BigDecimal standardDeviation = getStandardDeviation(deviationMeasure, numberPoints); //ско
         res.add(standardDeviation);
@@ -112,6 +110,25 @@ public class ApproximationManager {
 
         };
         List<BigDecimal> res = matrixManager.reverseRunning(matrixManager.straightRunning(matrix));
+
+        List<BigDecimal> approxFun = pointsX.stream().map(
+                x -> res.get(0).add(
+                        res.get(1).multiply(x).add(
+                                res.get(2).multiply(x.pow(2)).add(
+                                        res.get(3).multiply(x.pow(3))
+                                )
+                        ))   //a+bx+cx^2+dx^3
+        ).toList();
+
+        BigDecimal deviationMeasure = summator.getSumOfSquaresOfDiff(approxFun, pointsY, 2); //S
+        res.add(deviationMeasure);
+
+        BigDecimal standardDeviation = getStandardDeviation(deviationMeasure, numberPoints); //ско
+        res.add(standardDeviation);
+
+        BigDecimal accuracyOfApproximation = getAccuracyOfApproximation(deviationMeasure, approxFun, pointsY, numberPoints);
+        res.add(accuracyOfApproximation); //R
+
         return res;
 //        List<BigDecimal> indexes = matrixManager.reverseRunning(matrixManager.straightRunning(matrix));
 //        return indexes;
@@ -134,6 +151,24 @@ public class ApproximationManager {
         };
         List<BigDecimal> res = matrixManager.reverseRunning(matrixManager.straightRunning(matrix));
         res.set(0, BigDecimal.valueOf(Math.exp(res.get(0).doubleValue())));
+
+
+        List<BigDecimal> approxFun = pointsX.stream().map(
+                x -> res.get(0).multiply(
+                        (BigDecimal.valueOf(
+                                Math.pow(x.doubleValue(), res.get(1).doubleValue())
+                        ))
+                )   //ax^b
+        ).toList();
+
+        BigDecimal deviationMeasure = summator.getSumOfSquaresOfDiff(approxFun, pointsY, 2); //S
+        res.add(deviationMeasure);
+
+        BigDecimal standardDeviation = getStandardDeviation(deviationMeasure, numberPoints); //ско
+        res.add(standardDeviation);
+
+        BigDecimal accuracyOfApproximation = getAccuracyOfApproximation(deviationMeasure, approxFun, pointsY, numberPoints);
+        res.add(accuracyOfApproximation); //R
         return res;
 //        return new BigDecimal[]{BigDecimal.valueOf(Math.exp(indexes[0].doubleValue())), indexes[1]};
     }
@@ -156,6 +191,22 @@ public class ApproximationManager {
         List<BigDecimal> res = matrixManager.reverseRunning(matrixManager.straightRunning(matrix));
         res.set(0, BigDecimal.valueOf(Math.exp(res.get(0).doubleValue())));
 
+        List<BigDecimal> approxFun = pointsX.stream().map(
+                x -> res.get(0).multiply(
+                        (BigDecimal.valueOf(
+                                Math.exp(x.multiply(res.get(1)).doubleValue())
+                        ))
+                )   //ae^(xb)
+        ).toList();
+
+        BigDecimal deviationMeasure = summator.getSumOfSquaresOfDiff(approxFun, pointsY, 2); //S
+        res.add(deviationMeasure);
+
+        BigDecimal standardDeviation = getStandardDeviation(deviationMeasure, numberPoints); //ско
+        res.add(standardDeviation);
+
+        BigDecimal accuracyOfApproximation = getAccuracyOfApproximation(deviationMeasure, approxFun, pointsY, numberPoints);
+        res.add(accuracyOfApproximation); //R
         return res;
     }
 
@@ -175,6 +226,23 @@ public class ApproximationManager {
         };
         List<BigDecimal> res = matrixManager.reverseRunning(matrixManager.straightRunning(matrix));
 
+
+        List<BigDecimal> approxFun = pointsX.stream().map(
+                x -> (res.get(1).multiply(
+                        (BigDecimal.valueOf(
+                                Math.log(x.doubleValue())
+                        )))).add(res.get(0))
+                  //alnx+b
+        ).toList();
+
+        BigDecimal deviationMeasure = summator.getSumOfSquaresOfDiff(approxFun, pointsY, 2); //S
+        res.add(deviationMeasure);
+
+        BigDecimal standardDeviation = getStandardDeviation(deviationMeasure, numberPoints); //ско
+        res.add(standardDeviation);
+
+        BigDecimal accuracyOfApproximation = getAccuracyOfApproximation(deviationMeasure, approxFun, pointsY, numberPoints);
+        res.add(accuracyOfApproximation); //R
         return res;
     }
 
