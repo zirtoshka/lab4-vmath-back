@@ -1,13 +1,11 @@
 package zir.lab4vmathback.utils;
 
 import exp.DeterminantException;
+import exp.IncorrectValueForMethodException;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ApproximationManager {
@@ -134,9 +132,12 @@ public class ApproximationManager {
 //        return indexes;
     }
 
-    public List<BigDecimal> getPowerApproximationIndexes(List<BigDecimal> pointsX, List<BigDecimal> pointsY) throws DeterminantException {
+    public List<BigDecimal> getPowerApproximationIndexes(List<BigDecimal> pointsX, List<BigDecimal> pointsY) throws DeterminantException, IncorrectValueForMethodException {
 //        ax^b
         int numberPoints = pointsX.size();
+        BigDecimal minX = Collections.min(pointsX);
+        BigDecimal minY = Collections.min(pointsY);
+        if (minX.compareTo(BigDecimal.ZERO)<0 || minY.compareTo(BigDecimal.ZERO)<0) throw new IncorrectValueForMethodException();
         List<BigDecimal> xAfterLn = pointsX.stream().map(x -> BigDecimal.valueOf(Math.log(x.doubleValue()))).collect(Collectors.toList());
         List<BigDecimal> yAfterLn = pointsY.stream().map(x -> BigDecimal.valueOf(Math.log(x.doubleValue()))).collect(Collectors.toList());
 
@@ -174,9 +175,11 @@ public class ApproximationManager {
     }
 
 
-    public List<BigDecimal> getExponentialApproximationIndexes(List<BigDecimal> pointsX, List<BigDecimal> pointsY) throws DeterminantException {
+    public List<BigDecimal> getExponentialApproximationIndexes(List<BigDecimal> pointsX, List<BigDecimal> pointsY) throws DeterminantException, IncorrectValueForMethodException {
 //        ae^(bx)
         int numberPoints = pointsX.size();
+        BigDecimal minY = Collections.min(pointsY);
+        if (minY.compareTo(BigDecimal.ZERO)<0) throw new IncorrectValueForMethodException();
         List<BigDecimal> yAfterLn = pointsY.stream().map(x -> BigDecimal.valueOf(Math.log(x.doubleValue()))).collect(Collectors.toList());
 
         BigDecimal sumX = summator.getSumOfPointsNDegree(pointsX, 1);
@@ -210,9 +213,11 @@ public class ApproximationManager {
         return res;
     }
 
-    public List<BigDecimal> getLogarithmicApproximationIndexes(List<BigDecimal> pointsX, List<BigDecimal> pointsY) throws DeterminantException {
+    public List<BigDecimal> getLogarithmicApproximationIndexes(List<BigDecimal> pointsX, List<BigDecimal> pointsY) throws DeterminantException, IncorrectValueForMethodException {
 //        alnx+b
         int numberPoints = pointsX.size();
+        BigDecimal minX = Collections.min(pointsX);
+        if (minX.compareTo(BigDecimal.ZERO)<0 ) throw new IncorrectValueForMethodException();
         List<BigDecimal> xAfterLn = pointsX.stream().map(x -> BigDecimal.valueOf(Math.log(x.doubleValue()))).collect(Collectors.toList());
 
         BigDecimal sumX = summator.getSumOfPointsNDegree(xAfterLn, 1);
@@ -251,12 +256,13 @@ public class ApproximationManager {
         return BigDecimal.valueOf(Math.sqrt(deviationMeasure.divide(BigDecimal.valueOf(numberPoints), MathContext.DECIMAL32).doubleValue())); //ско
     }
 
-    private BigDecimal getAccuracyOfApproximation(BigDecimal deviationMeasure, List<BigDecimal> approxFun, List<BigDecimal> pointsY, int numberPoints) {
+    private BigDecimal getAccuracyOfApproximation(BigDecimal deviationMeasure, List<BigDecimal> approxFun, List<BigDecimal> pointsY, int numberPoints)  {
         BigDecimal medApproxFun = summator.getSumOfPointsNDegree(approxFun, 1).divide(BigDecimal.valueOf(numberPoints), MathContext.DECIMAL32);
 
         List<BigDecimal> denominatorFun = pointsY.stream().map(x -> x.subtract(medApproxFun)).collect(Collectors.toList());
         BigDecimal denominator = summator.getSumOfPointsNDegree(denominatorFun, 2);
-        return BigDecimal.ONE.subtract(deviationMeasure.divide(denominator, MathContext.DECIMAL32));
+        BigDecimal res = BigDecimal.ONE.subtract(deviationMeasure.divide(denominator, MathContext.DECIMAL32));
+        return res;
     }
 
     private BigDecimal getCorrelationCoefficient(List<BigDecimal> x, List<BigDecimal> y, int numberPoints) {
